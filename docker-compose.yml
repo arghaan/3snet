@@ -1,0 +1,86 @@
+version: '3.3'
+
+services:
+  db:
+    container_name: db
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./.docker/mysql/utf8mb4.cnf:/etc/mysql/conf.d/utf8mb4.cnf:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: 3snet
+      MYSQL_USER: user
+      MYSQL_PASSWORD: qwerty
+    ports:
+      - "3306:3306"
+    networks:
+      - app
+
+  php:
+    container_name: php
+    build: ./.docker/php
+    ports:
+      - "9001:9000"
+    volumes:
+      - ./:/var/www/symfony:cached
+      - /etc/timezone:/etc/timezone:cached
+    networks:
+      - app
+    environment:
+      PHP_EXTENSION_XDEBUG: 1
+      PHP_EXTENSION_GD: 1
+      PHP_EXTENSION_AMQP: 1
+      PHP_EXTENSION_PDO_PGSQL: 1
+      PHP_EXTENSION_INTL: 1
+      PHP_INI_MEMORY_LIMIT: 1G
+      PHP_INI_MAX_EXECUTION_TIME: 120
+
+  nginx:
+    container_name: nginx
+    build: ./.docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/symfony:cached
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./var/log/access.log:/var/log/nginx/access.log
+    networks:
+      - app
+
+  supervisor:
+    build: ./.docker/supervisor
+    container_name: supervisor
+    environment:
+      PHP_EXTENSION_AMQP: 1
+      PHP_INI_MEMORY_LIMIT: 1G
+      PHP_INI_MAX_EXECUTION_TIME: 120
+    networks:
+      - app
+    volumes:
+      - ./:/var/www/symfony:cached
+      - ./.docker/supervisor/etc/supervisor:/etc/supervisor
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    networks:
+      - app
+    ports:
+      - "5672:5672"
+      - "8081:15672"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - app
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql_data:
+
+networks:
+  app:
+    external: true

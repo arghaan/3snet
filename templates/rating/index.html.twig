@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Top</th>
+            <th scope="col">#</th>
+            <th scope="col">Text</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Rating</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if  posts %}
+            {% for post in posts %}
+                <tr class="post_row" data-post-id="{{ post.id }}">
+                    <th scope="row" class="col-auto">{{ loop.index }}</th>
+                    <th scope="row" class="col-auto">{{ post.id }}</th>
+                    <td class="col-10">
+                        {% if post.text|length > 150 %}
+                            {{ post.text|slice(0, 150) ~ '...' }}
+                        {% else %}
+                            {{ post.text }}
+                        {% endif %}
+                    </td>
+                    <td class="col-1">{{ post.created_at | date("m.d.Y H:i") }}</td>
+                    <td class="col-1">{{ post.rating | default(0) }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+{% endblock %}

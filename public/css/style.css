@@ -1,0 +1,27 @@
+.complaint.disabled {
+    color: grey !important;
+    cursor: auto;
+}
+
+.complaint {
+    color: #0a58ca;
+    cursor: pointer;
+}
+
+.rating {
+    color: #0a58ca;
+    cursor: pointer;
+}
+
+.rating.disabled {
+    color: grey !important;
+    cursor: auto;
+}
+
+.post_row > td, th {
+    cursor: pointer;
+}
+
+.post_row:hover {
+    background-color: grey;
+}

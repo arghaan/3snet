@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="card mx-auto mt-4" style="width: 50%;">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <span class="card-title mr-auto">#{{ post.id }}</span>
+                <span>{{ post.created_at|date("m.d.Y H:i") }}</span>
+            </div>
+            <p class="card-text">{{ post.text }}</p>
+        </div>
+        <div class="d-flex mx-5 fs-3 buttons" data-post-id="{{ post.id }}">
+            <i class="bi bi-exclamation-square complaint{% if post.com > 0 %} disabled {% endif %}"></i>
+            <div class="d-flex mx-auto">
+                <i class="bi bi-plus-square rating{% if post.rating > 0 %} disabled {% endif %}"
+                   data-rating="+1"></i>
+                <div class="d-inline-block fs-5 mx-3"
+                     style="{% if post.sum_rating > 0 %}color: green;{% elseif post.sum_rating < 0 %}color: red{% endif %}">{{ post.sum_rating | default(0) }}</div>
+                <i class="bi bi-dash-square rating{% if post.rating > 0 %} disabled {% endif %}"
+                   data-rating="-1"></i>
+            </div>
+        </div>
+    </div>
+{% endblock %}

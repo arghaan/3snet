@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+{% block search %}
+    {% include 'search.html.twig' %}
+{% endblock %}
+{% block body %}
+    <div class="d-flex justify-content-end">
+        <div class="mx-5">
+            <a href="/admin/post" class="text-success"><i class="bi bi-plus-square-fill fs-1"></i></a>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Text</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Modified At</th>
+            <th scope="col">Alias</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if  posts %}
+            {% for post in posts %}
+                <tr>
+                    <th scope="row" class="col-auto">{{ post.id }}</th>
+                    <td class="col-8">
+                        {% if post.text|length > 150 %}
+                            {{ post.text|slice(0, 150) ~ '...' }}
+                        {% else %}
+                            {{ post.text }}
+                        {% endif %}
+                    </td>
+                    <td class="col-auto">{{ post.created_at | date("m.d.Y H:i") }}</td>
+                    <td class="col-auto">{% if  post.modified_at %}
+                            {{ post.modified_at | date("m.d.Y H:i") }}
+                        {% endif %}</td>
+                    <td class="col-auto">{{ post.alias | default('-') }}</td>
+                    <td class="col-auto">
+                        <a href="/admin/post/{{ post.id }}/edit" class="mx-3 text-warning"><i
+                                    class="bi bi-pencil-square"></i></a>
+                        <a href="/admin/post/{{ post.id }}/delete" class="text-danger"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <h2>Not found</h2>
+        {% endif %}
+        </tbody>
+    </table>
+    {% if posts %}
+        <div class="navigation w-25 mx-auto mt-3">
+            {{ knp_pagination_render(posts, '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig') }}
+        </div>
+    {% endif %}
+{% endblock %}
