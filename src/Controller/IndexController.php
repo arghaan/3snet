@@ -25,7 +25,7 @@ class IndexController extends AbstractController
     {
         $searchText = $request->request->get('search');
         $page = (int)$request->query->get('page', 1);
-        $posts = $this->postService->getPosts($page, $searchText, $request->server->get('REMOTE_ADDR'));
+        $posts = $this->postService->getPosts(true, $page, $searchText, $request->server->get('REMOTE_ADDR'));
         return $this->render('index.html.twig', [
             'pagination' => $posts,
             'search' => $searchText

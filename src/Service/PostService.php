@@ -20,9 +20,9 @@ class PostService
         $this->cache = $cache;
     }
 
-    public function getPosts(int $page = 1, string $searchText = null, string $ip = null): ?PaginationInterface
+    public function getPosts(bool $useCache, int $page = 1, string $searchText = null, string $ip = null): ?PaginationInterface
     {
-        if (null === $page || 1 === $page) {
+        if ((null === $page || 1 === $page) && $useCache) {
             $first = $this->cache->get('first');
             if ($first->isHit()) {
                 return $first->get();

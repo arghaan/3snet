@@ -33,7 +33,7 @@ class AdminPostController extends AbstractController
     {
         $searchText = $request->request->get('search');
         $page = (int)$request->query->get('page', 1);
-        $posts = $postService->getPosts($page, $searchText);
+        $posts = $postService->getPosts(false, $page, $searchText);
         return $this->render('admin/index.html.twig', [
             'posts' => $posts,
             'search' => $searchText,

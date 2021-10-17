@@ -3,13 +3,14 @@
 namespace App\EventListener;
 
 use App\Entity\Post;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 class PostEventListener
 {
+    private bool $needCacheClear = false;
     private LoggerInterface $logger;
 
     /**
@@ -20,49 +21,40 @@ class PostEventListener
         $this->logger = $logger;
     }
 
-
-    public function postUpdate(Post $post, LifecycleEventArgs $event): void
-    {
-//        /** @var UnitOfWork $uow */
-//        $uow = $event->getObjectManager()->getUnitOfWork();
-//        $changeSet = $uow->getEntityChangeSet($post);
-//        if (isset($changeSet['alias'])) {
-//            list(, $new) = $changeSet['alias'];
-//            if ($new) {
-//                $this->logger->info('Clear cache.');
-//                $process = new Process(
-//                    ['/var/www/symfony/bin/console', 'ca:cl']
-//                );
-//                $process->run();
-//                $this->logger->warning($process->getOutput());
-//            }
-//        }
-    }
-
-    public function postFlush(PostFlushEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args)
     {
         $em = $args->getEntityManager();
         $uow = $em->getUnitOfWork();
-        $needClear = true;
-
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof Post) {
-                $needClear = true;
+                $changeSet = $uow->getEntityChangeSet($entity);
+                if (
+                    key_exists('alias', $changeSet)
+                    && $changeSet['alias'] != $entity->getAlias()
+                )
+                {
+                    $this->needCacheClear = true;
+                }
             }
         }
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof Post) {
-                $needClear = true;
+                if (null !== $entity->getAlias()) {
+                    $this->needCacheClear = true;
+                }
             }
         }
-        if ($needClear) {
+    }
+
+    public function postFlush(PostFlushEventArgs $args)
+    {
+        if ($this->needCacheClear){
             $this->logger->info('Clear cache.');
             $process = new Process(
                 ['/var/www/symfony/bin/console', 'ca:cl']
             );
             $process->run();
-            $this->logger->warning($process->getOutput());
         }
     }
 }
