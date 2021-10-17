@@ -3,12 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Post;
-use App\Entity\Rating;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -24,16 +21,19 @@ class PostRepository extends ServiceEntityRepository
 {
     private PaginatorInterface $paginator;
     private EntityManagerInterface $em;
+    private LoggerInterface $logger;
 
     public function __construct(
         ManagerRegistry        $registry,
         PaginatorInterface     $paginator,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        LoggerInterface $logger
     )
     {
         parent::__construct($registry, Post::class);
         $this->paginator = $paginator;
         $this->em = $em;
+        $this->logger = $logger;
     }
 
     public function getPost(Post $post, string $ip)
@@ -132,9 +132,9 @@ class PostRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function savePost(Post $post): void
+    public function savePost(Post $message): void
     {
-        $this->em->persist($post);
+        $this->em->persist($message);
         $this->em->flush();
     }
 
@@ -154,6 +154,7 @@ class PostRepository extends ServiceEntityRepository
     public function deletePost(Post $message): void
     {
         $post = $this->find($message->getId());
+
         if (null !== $post) {
             $this->em->remove($post);
             $this->em->flush();

@@ -26,3 +26,9 @@ services:
 
     App\Routing\RouteAliasLoader:
         tags: [ routing.loader ]
+
+    App\EventListener\PostEventListener:
+        tags:
+            - name: 'doctrine.event_listener'
+              event: 'postFlush'
+              entity: 'App\Entity\Post'

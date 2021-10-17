@@ -32,7 +32,7 @@ class RouteAliasLoader extends Loader
                     '_controller' => PostController::class . '::show',
                     'id' => $post->getId()
                 ]);
-                $routeName = 'alias_' . $post->getId() . '_' . $post->getAlias();
+                $routeName = 'alias_' . $post->getId();
                 $collection->add($routeName, $route);
             }
         }

@@ -44,7 +44,7 @@ class Post
     private $alias;
 
     /**
-     * @ORM\OneToMany(targetEntity=Complaint::class, mappedBy="postId", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Complaint::class, mappedBy="post", orphanRemoval=true)
      */
     private $complaints;
 
