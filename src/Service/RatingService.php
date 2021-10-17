@@ -7,28 +7,38 @@ use App\Entity\Rating;
 use App\Repository\PostRepository;
 use App\Repository\RatingRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\InvalidArgumentException;
 
 class RatingService
 {
     private EntityManagerInterface $em;
     private RatingRepository $repository;
     private PostRepository $postRepository;
+    private CacheService $cache;
 
     public function __construct(
         EntityManagerInterface $em,
         RatingRepository       $repository,
-        PostRepository         $postRepository
+        PostRepository         $postRepository,
+        CacheService $cache
     )
     {
         $this->em = $em;
         $this->repository = $repository;
         $this->postRepository = $postRepository;
+        $this->cache = $cache;
     }
 
     public function addRating(Rating $rating)
     {
-        $this->em->persist($rating);
-        $this->em->flush();
+        try {
+            $this->cache->delete('rating');
+        } catch (InvalidArgumentException $e) {
+
+        } finally {
+            $this->em->persist($rating);
+            $this->em->flush();
+        }
     }
 
     public function hasRating(Post $post, string $ip): bool
@@ -43,6 +53,17 @@ class RatingService
 
     public function getTop10()
     {
-        return $this->postRepository->getTop10();
+        $rating = $this->cache->get('rating');
+        if ($rating->isHit()) {
+            return $rating->get();
+        }
+        $items = $this->postRepository->getTop10();
+        $tags = [];
+        /** @var Post $item */
+        foreach ($items as $item) {
+            $tags[] = 'post_'.$item['id'];
+        }
+        $this->cache->save('rating', $items, $tags, (int)$_ENV['REDIS_EXPIRE_AFTER']);
+        return $items;
     }
 }

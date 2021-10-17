@@ -32,3 +32,8 @@ services:
             - name: 'doctrine.event_listener'
               event: 'postFlush'
               entity: 'App\Entity\Post'
+
+    cache.adapter.redis_taggable:
+        class: Symfony\Component\Cache\Adapter\RedisTagAwareAdapter
+        parent: cache.adapter.redis
+        tags: { name: cache.pool, clearer: cache.app_clearer, provider: '%env(resolve:REDIS_DSN)%' }
