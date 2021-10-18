@@ -10,7 +10,7 @@
             <div>{{ form_errors(form.text) }}</div>
         </div>
         <div class="mb-5">
-            <label class="form-label">{{ form_label(form.alias) }}</label>
+            <label class="form-label">{{ form_label(form.alias) }} (/{slug})</label>
             {{ form_widget(form.alias, {'attr': {'class': 'form-control'}}) }}
             <div class="alert-danger mt-1">{{ form_errors(form.alias) }}</div>
         </div>
