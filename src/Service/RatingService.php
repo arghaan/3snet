@@ -33,6 +33,7 @@ class RatingService
     {
         try {
             $this->cache->delete('rating');
+            $this->cache->delete('first');
         } catch (InvalidArgumentException $e) {
 
         } finally {
@@ -48,7 +49,7 @@ class RatingService
 
     public function getRating(Post $post): int
     {
-        return $this->repository->getRating($post);
+        return $this->repository->getRating($post)[0][1];
     }
 
     public function getTop10()

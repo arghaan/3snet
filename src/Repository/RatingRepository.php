@@ -22,12 +22,12 @@ class RatingRepository extends ServiceEntityRepository
 
     public function getRating(Post $post)
     {
-        return $this->createQueryBuilder('r')
+        $query = $this->createQueryBuilder('r')
             ->select('SUM(r.rating)')
             ->andWhere('r.post = :post')
             ->setParameter('post', $post)
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
+        return $query->getResult();
     }
 
     // /**

@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * @method Post|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,19 +20,16 @@ class PostRepository extends ServiceEntityRepository
 {
     private PaginatorInterface $paginator;
     private EntityManagerInterface $em;
-    private LoggerInterface $logger;
 
     public function __construct(
         ManagerRegistry        $registry,
         PaginatorInterface     $paginator,
-        EntityManagerInterface $em,
-        LoggerInterface $logger
+        EntityManagerInterface $em
     )
     {
         parent::__construct($registry, Post::class);
         $this->paginator = $paginator;
         $this->em = $em;
-        $this->logger = $logger;
     }
 
     public function getPost(Post $post, string $ip)
@@ -120,16 +116,15 @@ class PostRepository extends ServiceEntityRepository
     public function getTop10()
     {
         $query = $this->createQueryBuilder('p');
-        return $query->select('p.id, p.text, p.created_at')
+        $query->select('p.id, p.text, p.created_at')
             ->addSelect('
-            (SELECT SUM(r.rating)
-            from App\Entity\Rating r
-            where r.post = p) rating
+                (SELECT COALESCE(SUM(r.rating), 0)
+                from App\Entity\Rating r
+                where r.post = p) rating
             ')
             ->orderBy('rating', 'DESC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults(10);
+        return $query->getQuery()->getResult();
     }
 
     public function savePost(Post $message): void

@@ -18,7 +18,7 @@
                     <div class="d-flex mx-auto">
                         <i class="bi bi-plus-square rating{% if post.rating > 0 %} disabled {% endif %}"
                            data-rating="+1"></i>
-                        <div class="d-inline-block fs-5 mx-3"
+                        <div class="d-inline-block fs-5 mx-3 sum_rating" id="sum_rating_{{ post.id }}"
                              style="{% if post.sum_rating > 0 %}color: green;{% elseif post.sum_rating < 0 %}color: red{% endif %}">{{ post.sum_rating | default(0) }}</div>
                         <i class="bi bi-dash-square rating{% if post.rating > 0 %} disabled {% endif %}"
                            data-rating="-1"></i>
