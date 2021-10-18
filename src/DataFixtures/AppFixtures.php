@@ -21,7 +21,7 @@ class AppFixtures extends Fixture
         for ($i = 0; $i < 100; $i++) {
             $post = new Post();
             $post->setText($faker->realText())
-                ->setCreatedAt(new DateTime($faker->dateTime()));
+                ->setCreatedAt($faker->dateTime());
             $manager->persist($post);
         }
         $manager->flush();
