@@ -85,8 +85,6 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
-            "rm -R var/log/access.log",
-            "echo -n > var/log/access.log",
             "@auto-scripts"
         ],
         "post-update-cmd": [
